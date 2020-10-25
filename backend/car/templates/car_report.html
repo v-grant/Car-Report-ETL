@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h3 class="bg-primary d-flex mr-4 p-2">Crash Report</h3>
+    <form method="POST" class="form-group">{% csrf_token %}
+    	<div class="container">
+		<h5 class="my-3">  
+		Fill the details below</h5>
+		<div class="row">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success  ml-2 mb-2">Save</button>
+        <button type="submit" class="btn btn-warning  ml-2 mb-2" onclick="location.href='{% url 'car-report' %}'">View Crash Report</button>
+         <button type="submit" class="btn btn-warning  ml-2 mb-2" onclick="location.href='{% url 'car-report' %}'">Go to upload pdf file</button>
+        </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+

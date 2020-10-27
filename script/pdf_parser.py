@@ -4,7 +4,8 @@ import os
 path = "pdf_files"
 dirs = os.listdir(path)
 for file in dirs:
-    pdf = pdfplumber.open(file)
+    print(file)
+    pdf = pdfplumber.open(os.path.join(path, file))
 
     page = pdf.pages[0]
     crcn = page.extract_text()[66:73]

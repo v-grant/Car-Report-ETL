@@ -14,9 +14,17 @@ CCADDRESS1 = "CCADDRESS1"
 CCZIP = "55555-4444"
 
 
-driver = webdriver.Chrome(
-    executable_path="C:/Users/me/Downloads/driver/chromedriver.exe"
-)
+# Define Chrome options to open the window in maximized mode
+options = webdriver.ChromeOptions()
+options.add_argument("--start-maximized")
+
+# Initialize the Chrome webdriver and open the URL
+driver = webdriver.Chrome(chrome_options=options)
+driver.implicitly_wait(30)
+
+# driver = webdriver.Chrome(
+#     executable_path="C:/Users/me/Downloads/driver/chromedriver.exe"
+# )
 driver.get("https://www.alabamainteractive.org/dps_crash_report")
 
 driver.find_element_by_id("mainMenu_mainMenuObject_confirmation").click()

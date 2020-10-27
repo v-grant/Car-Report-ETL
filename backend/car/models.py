@@ -24,3 +24,12 @@ class CrashReport(models.Model):
 
     def __str__(self):
         return self.crash_report_case_no
+
+
+class RequestReport(models.Model):
+    report_num = models.CharField(max_length=100)
+    request_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.reportnum
+        self.save()

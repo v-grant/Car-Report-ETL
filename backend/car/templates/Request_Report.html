@@ -1,0 +1,16 @@
+ 
+{% extends 'base.html' %} 
+{% block content %}
+</form>
+
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-8">
+        <form class="form-inline" name="requestreportview" action="{% url 'request-report' %}" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}<label>
+   		<button type="submit" onclick="href.location{% url 'request-report' %}" class="btn btn-primary">Request Report</button>
+        </form>
+      </div>
+      <div class="col-4">
+      </div>
+    </div>
+{% endblock %}

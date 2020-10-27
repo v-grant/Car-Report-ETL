@@ -20,7 +20,16 @@ class CrashReport(models.Model):
     sex = models.CharField(max_length=10)
     dL_state = models.CharField(max_length=35)
     driving_license_no = models.CharField(max_length=15)
-    file_attached = models.FileField(upload_to="files/", null=True, verbose_name="")
+    file_attached = models.FileField(null=True, verbose_name="")
 
     def __str__(self):
         return self.crash_report_case_no
+
+
+class RequestReport(models.Model):
+    report_num = models.CharField(max_length=100)
+    request_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.reportnum
+        self.save()

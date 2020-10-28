@@ -10,7 +10,7 @@
     <div class="row">
       <div class="col-8">
         <form class="form-inline" name="pdfgenerate" action="{% url 'pdf-report' %}" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}<label>
-          <label style="background-color: cornflowerblue;" for="files" class="btn">Upload Tacticalarbitrage CSV</label>
+          <label style="background-color: cornflowerblue;" for="files" class="btn">Upload a Car Accident Report</label>
            <input id="files" type="file" id="fileupload" style="visibility:hidden;" name="filename" class="autosubmit">
         </form>
       </div>

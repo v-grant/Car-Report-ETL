@@ -17,7 +17,6 @@ class CrashReportViews(View):
     def get(self, request, *args, **kwargs):
         queryset = CrashReport.objects.all()
         queryset = {"queryset": queryset}
-        # import pdb; pdb.set_trace()
         return render(request, "data_report.html", queryset)
 
 
@@ -101,7 +100,7 @@ def scrap_data(file_data):
                     if c1 == 0 and c2 == 8 and c3 == 20:
                         d = {"driving_license_no": x[19:]}
                         dict.update(d)
-                    d = {"crash_report_case_no": crcn}
+                        d = {"crash_report_case_no": crcn}
                     dict2.update(d)
                     if c1 == 2 and c2 == 0 and c3 == 0:
                         d = {"local_case_no": x[15:]}
@@ -159,12 +158,14 @@ def scrap_data(file_data):
                         dict2.update(d)
     return dict2
 
-
 def nu(num1, num2):
     digits = len(str(num2))
     num1 = num1 * (10 ** digits)
     num1 += num2
     return num1
+
+def split(word): 
+    return [char for char in word] 
 
 
 def parse_pdf(request):
@@ -175,6 +176,28 @@ def parse_pdf(request):
         day = int(data.get("Date_Day"))
         year = int(data.get("Date_year"))
         data_date = datetime.datetime.strptime(str(nu(year, nu(day, month))), "%Y%d%m")
+        dob_date= data.get("DOB_Month") + str("/")+data.get("DOB_Day") +str("/")+ data.get("DOB_Year")
+        inputt = data.get('telephone')
+        dt = split(inputt)
+        telephone1 = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+  str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
+
+        bc = data["Drivers_full_name_Street_Address_City_and_State"].split(" ")
+        name= []
+        add =[]
+        y= 'sdf'
+        for x in bc:
+           try:
+            int(x)
+            add.append(str(x))
+            y = "fds"
+           except Exception as e:
+                 if y =='sdf':
+                   name.append(x)
+                 else:
+                   add.append(x)
+                   dfname = ' '.join(map(str,name))
+                   daddess = ' '.join(map(str,add))
+
         pk = CrashReport.objects.create(
             crash_report_case_no=data["crash_report_case_no"],
             local_case_no=data["local_case_no"],
@@ -183,12 +206,11 @@ def parse_pdf(request):
             day_of_week=data["day_of_week"],
             county=data["county"],
             city=data["city"],
-            Drivers_full_name_Street_Address_City_and_State=data[
-                "Drivers_full_name_Street_Address_City_and_State"
-            ],
+            Drivers_full_name=dfname,
+            Street_Address_City_and_State=daddess,
             zipcode=data["zipcode"],
-            telephone=data["telephone"],
-            dob=data["DOB_Day"] + data["Date_Month"] + data["DOB_Year"],
+            telephone=telephone1,
+            dob=dob_date,
             race=data["race"],
             sex=data["sex"],
             dL_state=data["dL_state"],

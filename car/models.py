@@ -28,9 +28,17 @@ class CrashReport(models.Model):
 
 
 class RequestReport(models.Model):
-    report_num = models.CharField(max_length=100)
-    request_time = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return self.reportnum
-        self.save()
+    search_result_choices = ( 
+    ("1", "Not Existing"), 
+    ("2", "Old Report"), 
+    ("3", "Single Car Accident"), 
+    ("4", "Both Of Reasons"), 
+)   
+    crash_report_num = models.CharField(max_length=100, null=True)
+    crash_date = models.CharField(max_length=100, null=True)
+    driver_name = models.CharField(max_length=100, null=True)
+    county = models.CharField(max_length=100, null=True)
+    search_date =  models.CharField(max_length=100, null=True)
+    search_result = models.CharField(max_length=1, choices = search_result_choices, null=True)
+    inserted_date = models.DateTimeField(auto_now_add=True)    
+    updatd_date = models.DateTimeField(auto_now=True)

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+Request Report
+	</title>
+</head>
+	</head>
+	{% block content %}
+<body>
+<table class="table table table-bordered table-striped table-hover table-responsive bg-primary">
+<thead style="background-color: grey; color: ghostwhite;">
+			<td> Crash Date</td>
+			<td> Name</td>
+			<td> County</td>
+		</thead>
+			{{datar}}
+			{% for x in data %}
+		<tr>
+			<td>
+				{{  x.Crash_Date }}
+			</td>
+			<td>
+				{{x.Name }}
+			</td>
+			<td>
+				{{ x.County }}
+			</td>
+		</tr>
+			{% endfor %}
+	</table>
+</body>
+<br>
+<button> Download</button>
+{% endblock %}
+</html>

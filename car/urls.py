@@ -14,7 +14,9 @@ urlpatterns = [
     path("pdfreport/", parse_pdf, name="pdf-report"),
     path("uploadedpdf/", savefile, name="uploaded-pdf"),
     path("RequestReport/", requestreportview, name="request-report"),
-    path("automator/", automator, name="related_automator")
+    path("automator/", automator, name="related_automator"),
+    path("mcrequest_report/", mcrequest_report, name="mcrequest_report")
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

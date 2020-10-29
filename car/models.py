@@ -29,11 +29,12 @@ class CrashReport(models.Model):
 
 class RequestReport(models.Model):
     search_result_choices = ( 
-    ("1", "Not Existing"), 
-    ("2", "Old Report"), 
-    ("3", "Single Car Accident"), 
-    ("4", "Both Of Reasons"), 
-)   
+        ("0", "Not Existing"), 
+        ("1", "Necessary"), 
+        ("2", "Old Report"), 
+        ("3", "Single Car Accident"), 
+        ("4", "Both Of Reasons"), 
+    )   
     crash_report_num = models.CharField(max_length=100, null=True, blank=True)
     crash_date = models.CharField(max_length=100, null=True, blank=True)
     driver_name = models.CharField(max_length=100, null=True, blank=True)

@@ -249,8 +249,8 @@ def scrape_reportinfo(soup):
 
     container = soup.find('form', {"id": "crash-search-form"})
     table = container.find_all('table')[-1]
-    print(table)
-    print(table.find('td', {"class": "reportHeader"}))
+    # print(table)
+    # print(table.find('td', {"class": "reportHeader"}))
     # if table.find('td', {"class": "reportHeader"}) is not None and table.find('td', {"class": "reportHeader"}).text.strip() == "Search Results":
     index = 1
     for inner_tr in table.tbody.find_all('tr', recursive=False):
@@ -267,6 +267,8 @@ def scrape_reportinfo(soup):
         form = RequestReportForm(post_values)
         if form.is_valid():
             form.save()
+    
+    print(reports)
     return reports
     
 # request_report()

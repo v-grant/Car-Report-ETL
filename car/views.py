@@ -36,7 +36,7 @@ class DataReport(View):
 class RequestReportView(View):
     def get(self, request, *args, **kwargs):
         reports = RequestReport.objects.all()
-        return render(request, "Request_report.html", {"reports": reports})
+        return render(request, "request_report.html", {"reports": reports})
     
     def post(self, request, *args, **kwargs):
         cr_number = request.POST.get('cr_number')

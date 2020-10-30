@@ -59,7 +59,7 @@ class RequestReport(models.Model):
     @property
     def search_result_type(self):
         try:
-            search_result_choices = {"0": "Not Existing", "1": "Needed", "2": "Old Report", "3": "Single Car Accident", "4": "Both Of Reasons"}
+            search_result_choices = {"0": "Not Existing", "1": "Needed", "2": "Old Report", "3": "Single Car Accident", "4": "Both Reasons"}
             return search_result_choices[self.search_result]
         except:
             return None

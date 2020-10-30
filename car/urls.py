@@ -14,7 +14,7 @@ urlpatterns = [
     path("uploadedpdf/", savefile, name="uploaded-pdf"),
     path("all_reports/", RequestReportView.as_view(), name="request-report"),
     path("automator/", automator, name="related_automator"),
-    # path("mcrequest_report/", mcrequest_report, name="mcrequest_report")
+    path("purchased_reports/", PurchasedReportView.as_view(), name="purchased_reports"),
 
 ]
 if settings.DEBUG:

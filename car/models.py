@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-
 class CrashReport(models.Model):
     crash_report_case_no = models.CharField(max_length=20)
     local_case_no = models.CharField(max_length=15)

@@ -11,6 +11,7 @@ from django.views.generic import View
 from reportlab.pdfgen import canvas
 from bs4 import BeautifulSoup
 import reportlab
+from django.db.models import Q
 
 #parsing & scraping scripts
 from script.pdf_parser import scrap_data
@@ -47,9 +48,16 @@ class CrashReportViews(View):
         CrashDrivers.objects.filter(crash_report_case_no=data['crash_report_case_no']).delete()
         for driver in data.get('drivers'):
             dob_date= driver["DOB_Month"] + str("/")+driver["DOB_Day"] +str("/")+ driver["DOB_Year"]
-            inputt = driver['telephone']
-            dt = split(inputt)
-            telephone = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
+            inputt = driver['telephone'].replace(" ", "")
+            telephone = inputt
+            if inputt.startswith('('):
+                telephone = inputt
+            elif inputt.startswith('+1'):
+                dt = split(inputt)
+                telephone = str("""(""") + str(dt[2]) + str(dt[3]) +str(dt[4])+ str(""")""") +str(dt[5]) + str(dt[6])+str(dt[7]) + str("""-""") + str(dt[8]) + str(dt[9])+ str(dt[10])+ str(dt[11])
+            else:
+                dt = split(inputt)
+                telephone = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
             bc = driver["Drivers_full_name_Street_Address_City_and_State"].split(" ")
             name= []
             add =[]
@@ -164,6 +172,10 @@ class RequestReportView(View):
         driver.close()
         return redirect('request-report')
 
+class PurchasedReportView(View):
+    def get(self, request, *args, **kwargs):
+        reports = RequestReport.objects.filter(report_confirmation_num__isnull=False).order_by('-crash_report_num')
+        return render(request, "purchase_report.html", {"reports": reports})
 def increment_report_num(report_num):
     
     return "0" + str(int(report_num[1:])+1)

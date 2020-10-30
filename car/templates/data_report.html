@@ -28,22 +28,22 @@
         <thead class="table thead-dark"> 
           <tr>
             <th>Crash Report Case No</th>
-            <th>Local Case No</th>
+            <!-- <th>Local Case No</th> -->
             <th>Date</th>
-            <th>Time</th>
-            <th>Day of Week</th>
+            <!-- <th>Time</th> -->
+            <!-- <th>Day of Week</th> -->
             <th>County</th>
-            <th>City</th>
-            <th>Rural </th>
+            <!-- <th>City</th> -->
+            <!-- <th>Rural </th> -->
             <th>Drivers_full_name</th>
             <th>Street_Address_City_and_State </th>
             <th>Zipcode</th>
             <th>Telephone</th>
             <th>DOB</th>
-            <th>Race</th>
-            <th>Sex</th>
+            <!-- <th>Race</th> -->
+            <!-- <th>Sex</th> -->
             <th>DL State:</th>
-            <th>Driving License No</th>
+            <!-- <th>Driving License No</th> -->
             <th>Attached File</th>
           </tr>
         </thead>
@@ -51,22 +51,22 @@
           {% for x in queryset %}
           <tr>
             <td>{{x.crash_report_case_no}}</td>
-            <td>{{x.local_case_no}}</td>
+            <!-- <td>{{x.local_case_no}}</td> -->
             <td>{{x.date}}</td>
-            <td>{{x.time}}</td>
-            <td>{{x.day_of_week}}</td>
+            <!-- <td>{{x.time}}</td> -->
+            <!-- <td>{{x.day_of_week}}</td> -->
             <td>{{x.county}}</td>
-            <td>{{x.city}}</td>
-            <td>{{x.rural}}</td>
+            <!-- <td>{{x.city}}</td> -->
+            <!-- <td>{{x.rural}}</td> -->
             <td>{{x.Drivers_full_name}}</td>
             <td>{{x.Street_Address_City_and_State}}</td>
             <td>{{x.zipcode}}</td>
             <td>{{x.telephone}}</td>
             <td>{{x.dob}}</td>
-            <td>{{x.race}}</td>
-            <td>{{x.sex}}</td>
+            <!-- <td>{{x.race}}</td> -->
+            <!-- <td>{{x.sex}}</td> -->
             <td>{{x.dL_state}}</td>
-            <td>{{x.driving_license_no}}</td>
+            <!-- <td>{{x.driving_license_no}}</td> -->
             <td><a href="{{ MEDIA_URL }}{{ x.file_attached }}" target="_blank">{{x.file_attached}}</a>
             </td>
           </tr>

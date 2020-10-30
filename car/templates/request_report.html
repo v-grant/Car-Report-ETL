@@ -1,0 +1,94 @@
+ 
+{% extends 'base.html' %} 
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-8">
+      <form class="form-inline" name="automator" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}
+        <label for="cr_number" class="form-label">Crash Report Number: </label> &nbsp;&nbsp;&nbsp;
+        <input id="cr_number" name="cr_number" class="form-control" type="text" /> &nbsp;&nbsp;&nbsp;
+        <button type="submit" class="btn btn-primary">Request Report</button>
+      </form>
+    </div>
+    <div class="col-4">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 text-right">
+      <button id="download_csv" class="btn btn-info">Download</button>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <table class="table table-bordered table-striped table-hover">
+        <thead style="background-color: grey; color: ghostwhite;">
+          <td> Crash Number</td>
+          <td> Report Type</td>
+          <td> Crash Date</td>
+          <td> Name</td>
+          <td> County</td>
+          <td> Search Date</td>
+        </thead>
+        <tbody>
+          {% for x in reports %}
+          <tr>
+            <td>
+              {{ x.crash_report_num }}
+            </td>
+            <td>
+              {{ x.search_result }}
+            </td>
+            <td>
+              {{ x.crash_date }}
+            </td>
+            <td>
+              {{ x.driver_name }}
+            </td>
+            <td>
+              {{ x.county }}
+            </td>
+            <td>
+              {{ x.search_date }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+</div>
+<script type="text/javascript">
+	function download_csv(csv, filename) {
+		var csvFile;
+		var downloadLink;
+		csvFile = new Blob([csv], {type: "text/csv"});
+		downloadLink = document.createElement("a");
+		downloadLink.download = filename;
+		downloadLink.href = window.URL.createObjectURL(csvFile);
+		downloadLink.style.display = "none";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+	}
+	function export_table_to_csv(html, filename) {
+		var csv = [];
+		var rows = document.querySelectorAll("table tr");
+		
+		for (var i = 0; i < rows.length; i++) {
+			var row = [], cols = rows[i].querySelectorAll("td, th");
+			
+			for (var j = 0; j < cols.length; j++) {
+        var text = cols[j].innerText;
+        text = text.replace(/,/g, ';');
+        row.push(text);  
+      }
+			csv.push(row.join(","));		
+		}
+		download_csv(csv.join("\n"), filename);
+	}
+	document.getElementById("download_csv").addEventListener("click", function () {
+		var html = document.querySelector("table").outerHTML;
+		export_table_to_csv(html, "table.csv");
+	});
+</script>
+{% endblock %}

@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect
 from .forms import CarReportForm, DataViewForm, RequestReportForm
 from .models import CrashReport, RequestReport
 from datetime import datetime
-import datetime
 from django.views.static import serve
 from django.contrib import messages
 from django.views.generic import View
@@ -12,11 +11,10 @@ from reportlab.pdfgen import canvas
 from bs4 import BeautifulSoup
 import pdfplumber
 import reportlab
-from selenium import webdriver
-from time import sleep
 
 from script.pdf_parser import scrap_data
-from .models import RequestReport
+from script.generate_report import search_report, scrape_reportinfo
+import time 
 
 class CrashReportViews(View):
     def get(self, request, *args, **kwargs):
@@ -160,6 +158,82 @@ def scrap_data(file_data):
                         dict1.update(d)
     return dict1
 
+class RequestReportView(View):
+    def get(self, request, *args, **kwargs):
+        reports = RequestReport.objects.all().order_by('-crash_report_num')
+        return render(request, "request_report.html", {"reports": reports})
+    
+    def post(self, request, *args, **kwargs):
+        cr_number = request.POST.get('cr_number')
+        #run selenium to fetch the crach report
+        count = 0
+
+        driver = search_report()
+
+        for count in range(0, 1000):
+            print(cr_number)
+            driver, results = scrape_reportinfo(driver, cr_number)
+            driver_name = ''
+            search_result_type = '0'
+            is_one_line = False
+            is_date_expired = False
+            if len(results) > 0:
+                if len(results) == 1:
+                    is_one_line = True
+                cr_date = results[0]['Crash_Date']
+                cr_timestamp = time.mktime(datetime.strptime(cr_date, "%m/%d/%Y").timetuple())
+                now_timestamp = time.time()
+                if((now_timestamp - cr_timestamp) > (6 * 3600 * 24)):
+                    is_date_expired = True
+                for result in results:
+                    driver_name = f'({result["Name"]})' if driver_name == '' else f'{driver_name} ({result["Name"]})'
+                
+                if is_one_line == True and is_date_expired == True:
+                    search_result_type ='4'
+                elif is_one_line == True:
+                    search_result_type = '3'
+                elif is_date_expired == True:
+                    search_result_type = '2'
+                else:
+                    search_result_type = '1'
+                
+                #store/update db row
+                try:
+                    request_report_obj = RequestReport.objects.get(crash_report_num=cr_number)
+                except RequestReport.DoesNotExist:
+                    request_report_obj = RequestReport()
+                    request_report_obj.inserted_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.crash_report_num = cr_number
+                request_report_obj.driver_name = driver_name
+                request_report_obj.crash_date = datetime.strptime(cr_date, "%m/%d/%Y").strftime('%Y-%m-%d')
+                request_report_obj.county = results[0]['County']
+                request_report_obj.search_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.search_result = search_result_type
+                request_report_obj.updatd_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                
+                request_report_obj.save()
+            else:
+                search_result_type == '0'
+                try:
+                    request_report_obj = RequestReport.objects.get(crash_report_num=cr_number)
+                except RequestReport.DoesNotExist:
+                    request_report_obj = RequestReport()
+                    request_report_obj.inserted_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.crash_report_num = cr_number
+                request_report_obj.search_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.search_result = search_result_type
+                request_report_obj.updatd_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                
+                request_report_obj.save()
+
+            cr_number = increment_report_num(cr_number)
+        
+        driver.close()
+        return redirect('request-report')
+
+def increment_report_num(report_num):
+    
+    return "0" + str(int(report_num[1:])+1)
 
 def nu(num1, num2):
     digits = len(str(num2))
@@ -277,111 +351,9 @@ def savefile(request):
         return render(request, "uploadedpdf.html", queryset)
 
 def requestreportview(request):
-    return render(request, "Request_report.html", {'report_data': RequestReport.objects.all()})
+    return render(request, "request_report.html", {})
+
 
 def automator(request):
     if request.method == "POST":
         pass
-
-def mcrequest_report(request, *args, **kwargs):
-  if request.method == 'POST':
-    
-    SECOND_ADDRESS = "SECOND_ADDRESS"
-    CITY = "CITY"
-    FIRSTNAME = "FIRSTNAME"
-    LASTNAME = "LASTNAME"
-    PHONENUMBER = "123-123-1234"
-    CRASHREPORTNUMBER = "0707261"
-    CCNUMBER = "1234567891234567"
-    CCNAME = "CCNAME"
-    CCADDRESS1 = "CCADDRESS1"
-    CCZIP = "55555-4444"
-
-    # chrome_options=options()
-    # chrome_options.add_argument('--headless')
-    # Define Chrome options to open the window in maximized mode
-    options = webdriver.ChromeOptions()
-    options.add_argument("--start-maximized")
-
-    # Initialize the Chrome webdriver and open the URL
-    driver = webdriver.Chrome(chrome_options=options)
-    driver.implicitly_wait(30)
-
-    # driver = webdriver.Chrome(
-    #     executable_path="C:/Users/me/Downloads/driver/chromedriver.exe"
-    # )
-    driver.get("https://www.alabamainteractive.org/dps_crash_report")
-    driver.find_element_by_id("mainMenu_mainMenuObject_confirmation").click()
-    driver.find_element_by_xpath("//input[@value='Purchase Crash Report']").click()
-    inputElement = driver.find_element_by_xpath("//input[@name='contactInformationObject.firstName']")
-    inputElement.send_keys(FIRSTNAME)
-
-    inputElement = driver.find_element_by_xpath("//input[@name='contactInformationObject.lastName']")
-    inputElement.send_keys(LASTNAME)
-
-    inputElement = driver.find_element_by_xpath("//input[@name='contactInformationObject.phoneNumber']")
-    inputElement.send_keys(PHONENUMBER)
-
-    driver.find_element_by_xpath("//input[@value='Continue']").click()
-    
-    #for searching data in range between
-    
-    # for number in range(707261, 707501):
-    #     num = "0"+str(number)
-
-    inputElement = driver.find_element_by_xpath("//input[@name='crashReportSearchObject.crashReportNumber']")
-    inputElement.send_keys(CRASHREPORTNUMBER)
-
-    driver.find_element_by_xpath("//input[@value='Search for Report']").click()
-    sleep(3)
-        # try:
-    driver.find_element_by_link_text("Add to Cart").click()
-    sleep(10)
-        # except:
-    inputElement = driver.find_element_by_xpath("//input[@name='crashReportSearchObject.crashReportNumber']") # .clear()
-        
-
-
-    soup = BeautifulSoup(driver.page_source, "lxml")
-        # data = {"report_number":CRASHREPORTNUMBER, "soup_output":soup}
-    report = scrape_reportinfo(soup, CRASHREPORTNUMBER)
-
-    return render(request, "Request_Report.html" , {'data': report})
-  
-  return render(request, "Request_Report.html" , {'datar': 'No data fetched'})
-
-# To Get each letter page url link
-def scrape_reportinfo(soup, CRASHREPORTNUMBER):
-
-    reports = []
-
-    container = soup.find('form', {"id": "crash-search-form"})
-    table = container.find_all('table')[-1]
-    print(table)
-    print(table.find('td', {"class": "reportHeader"}))
-    # if table.find('td', {"class": "reportHeader"}) is not None and table.find('td', {"class": "reportHeader"}).text.strip() == "Search Results":
-    index = 1
-    for inner_tr in table.tbody.find_all('tr', recursive=False):
-        print(inner_tr)
-        if index < 3: 
-            index = index + 1
-            continue
-        reports.append({'Crash_Date': inner_tr.find_all('td')[0].text.strip(), 'Name': inner_tr.find_all('td')[1].text.strip(), 'County': inner_tr.find_all('td')[2].text.strip()})
-    post_values ={}
-    for x in reports:
-        post_values['driver_name'] =x.get("Name").replace(",", "")
-        post_values['crash_date'] =x.get("Crash_Date")
-        post_values['county'] =x.get("County")  
-        post_values['crash_report_num']= CRASHREPORTNUMBER
-        form = RequestReportForm(post_values)
-        if form.is_valid():
-            form.save()
-    pd= []
-    for x in reports:
-        for key, value in x.items():
-         m=value.replace(',','')
-         n=key
-         pd.append("{"+n+':'+m+"}")
-    # print(reports)
-    return reports
-# request_report()

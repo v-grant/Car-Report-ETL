@@ -35,7 +35,7 @@ class DataReport(View):
 
 class RequestReportView(View):
     def get(self, request, *args, **kwargs):
-        reports = RequestReport.objects.all()
+        reports = RequestReport.objects.all().order_by('-crash_report_num')
         return render(request, "request_report.html", {"reports": reports})
     
     def post(self, request, *args, **kwargs):

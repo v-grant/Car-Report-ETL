@@ -9,7 +9,7 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-8">
-        <form class="form-inline" name="pdfgenerate" action="{% url 'pdf-report' %}" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}<label>
+        <form class="form-inline" name="pdfgenerate" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}<label>
           <label style="background-color: cornflowerblue;" for="files" class="btn">Upload a Car Accident Report</label>
            <input id="files" type="file" id="fileupload" style="visibility:hidden;" name="filename" class="autosubmit">
         </form>
@@ -51,13 +51,13 @@
           {% for x in queryset %}
           <tr>
             <td>{{x.crash_report_case_no}}</td>
-            <td>{{x.local_case_no}}</td>
-            <td>{{x.date}}</td>
-            <td>{{x.time}}</td>
-            <td>{{x.day_of_week}}</td>
-            <td>{{x.county}}</td>
-            <td>{{x.city}}</td>
-            <td>{{x.rural}}</td>
+            <td>{{x.crash_report.local_case_no}}</td>
+            <td>{{x.crash_report.date}}</td>
+            <td>{{x.crash_report.time}}</td>
+            <td>{{x.crash_report.day_of_week}}</td>
+            <td>{{x.crash_report.county}}</td>
+            <td>{{x.crash_report.city}}</td>
+            <td>{{x.crash_report.rural}}</td>
             <td>{{x.Drivers_full_name}}</td>
             <td>{{x.Street_Address_City_and_State}}</td>
             <td>{{x.zipcode}}</td>
@@ -67,7 +67,7 @@
             <td>{{x.sex}}</td>
             <td>{{x.dL_state}}</td>
             <td>{{x.driving_license_no}}</td>
-            <td><a href="{{ MEDIA_URL }}{{ x.file_attached }}" target="_blank">{{x.file_attached}}</a>
+            <td><a href="{{ MEDIA_URL }}{{ x.file_attached }}" target="_blank">{{x.crash_report.file_attached}}</a>
             </td>
           </tr>
           {% endfor %}

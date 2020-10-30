@@ -124,4 +124,41 @@ def scrap_data(file_data):
                     if c1 == 0 and c2 == 25 and c3 == 20:
                         d = {"driving_license_no1": x[19:]}
                         dict1.update(d)
-    return dict1
+    sample_dict = {
+        'crash_report_case_no': '0707338', 
+        'date_month': '10', 
+        'date_day': '26', 
+        'date_year': '2020', 
+        'time': '0552 MT', 
+        'day_of_week': 'Mon', 
+        'county': 'Limestone', 
+        'city': 'Huntsville', 
+        'local_case_no': '42005617',
+        'drivers': [
+            {
+                'Drivers_full_name_Street_Address_City_and_State': 'JOYCE UNK DURHAM 287 CHURCH AVE NEW HOPE AL', 
+                'zipcode': '35760', 
+                'telephone': '(256) 244-8700', 
+                'DOB_Month': '06', 
+                'DOB_Day': '21', 
+                'DOB_Year': '1958', 
+                'race': '1', 
+                'sex': '2', 
+                'dL_state': 'AL', 
+                'driving_license_no': '3982288', 
+            },
+            {
+                'Drivers_full_name_Street_Address_City_and_State': 'JEREMY DANIEL TURNER 2746G BOBO SECTION RD HAZEL GREEN AL', 
+                'zipcode': '35750', 
+                'telephone': '(256) 658-0934', 
+                'DOB_Month': '11', 
+                'DOB_Day': '21', 
+                'DOB_Year': '1984', 
+                'race': '1', 
+                'sex': '1', 
+                'dL_state': 'AL', 
+                'driving_license_no': '7048991', 
+            }
+        ]
+    }
+    return sample_dict

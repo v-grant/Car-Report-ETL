@@ -9,7 +9,7 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-8">
-        <form class="form-inline" name="pdfgenerate" action="{% url 'pdf-report' %}" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}<label>
+        <form class="form-inline" name="pdfgenerate" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}<label>
           <label style="background-color: cornflowerblue;" for="files" class="btn">Upload a Car Accident Report</label>
            <input id="files" type="file" id="fileupload" style="visibility:hidden;" name="filename" class="autosubmit">
         </form>
@@ -21,6 +21,8 @@
   <div class="container-fluid">
     <div class="row mb-3">
       <div class="col-md-12 text-right">
+        <a href="{% url 'request-report' %}" class="btn btn-primary">View All Reports</a>
+        <a href="{% url 'purchased_reports' %}" class="btn btn-primary">View Purchase Reports</a>
         <button id="download_csv" class="btn btn-info">Download</button>
       </div>
     </div>
@@ -52,10 +54,10 @@
           <tr>
             <td>{{x.crash_report_case_no}}</td>
             <!-- <td>{{x.local_case_no}}</td> -->
-            <td>{{x.date}}</td>
+            <td>{{x.crash_report.date}}</td>
             <!-- <td>{{x.time}}</td> -->
             <!-- <td>{{x.day_of_week}}</td> -->
-            <td>{{x.county}}</td>
+            <td>{{x.crash_report.county}}</td>
             <!-- <td>{{x.city}}</td> -->
             <!-- <td>{{x.rural}}</td> -->
             <td>{{x.Drivers_full_name}}</td>
@@ -66,8 +68,8 @@
             <!-- <td>{{x.race}}</td> -->
             <!-- <td>{{x.sex}}</td> -->
             <td>{{x.dL_state}}</td>
-            <!-- <td>{{x.driving_license_no}}</td> -->
-            <td><a href="{{ MEDIA_URL }}{{ x.file_attached }}" target="_blank">{{x.file_attached}}</a>
+            <td>{{x.driving_license_no}}</td>
+            <td><a href="{{ MEDIA_URL }}{{ x.file_attached }}" target="_blank">{{x.crash_report.file_attached}}</a>
             </td>
           </tr>
           {% endfor %}
@@ -106,7 +108,7 @@ function export_table_to_csv(html, filename) {
       if(a_tags.length > 0){
         text = a_tags[0].href;
       }
-      text = text.replace(/,/g, ';');
+      text = text.replace(/,/g, ' ');
       row.push(text);  
     }
     csv.push(row.join(","));		

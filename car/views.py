@@ -2,7 +2,7 @@ import io
 import os
 from django.shortcuts import render, redirect
 from .forms import CarReportForm, DataViewForm, RequestReportForm
-from .models import CrashReport, RequestReport
+from .models import CrashReport, RequestReport, CrashDrivers
 from datetime import datetime
 import time
 from django.views.static import serve
@@ -11,6 +11,7 @@ from django.views.generic import View
 from reportlab.pdfgen import canvas
 from bs4 import BeautifulSoup
 import reportlab
+from django.db.models import Q
 
 #parsing & scraping scripts
 from script.pdf_parser import scrap_data
@@ -18,9 +19,74 @@ from script.generate_report import search_report, scrape_reportinfo
 
 class CrashReportViews(View):
     def get(self, request, *args, **kwargs):
-        queryset = CrashReport.objects.all()
+        queryset = CrashDrivers.objects.all().order_by('-crash_report_case_no')
         queryset = {"queryset": queryset}
         return render(request, "data_report.html", queryset)
+    def post(self, request, *args, **kwargs):
+        file_attached = request.FILES["filename"]
+        data = scrap_data(request.FILES["filename"])
+        month = int(data.get("date_month"))
+        day = int(data.get("date_day"))
+        year = int(data.get("date_year"))
+        data_date = datetime.strptime(str(nu(year, nu(day, month))), "%Y%d%m")
+        
+        try:
+            cr_obj = CrashReport.objects.get(crash_report_case_no=data['crash_report_case_no'])
+        except CrashReport.DoesNotExist:
+            cr_obj = CrashReport()
+        cr_obj.crash_report_case_no = data["crash_report_case_no"]
+        cr_obj.local_case_no = data["local_case_no"]
+        cr_obj.date = data_date
+        cr_obj.time = data["time"]
+        cr_obj.day_of_week = data["day_of_week"]
+        cr_obj.county = data["county"]
+        cr_obj.city = data["city"]
+        cr_obj.file_attached = file_attached
+        
+        cr_obj.save()
+
+        CrashDrivers.objects.filter(crash_report_case_no=data['crash_report_case_no']).delete()
+        for driver in data.get('drivers'):
+            dob_date= driver["DOB_Month"] + str("/")+driver["DOB_Day"] +str("/")+ driver["DOB_Year"]
+            inputt = driver['telephone'].replace(" ", "")
+            telephone = inputt
+            if inputt.startswith('('):
+                telephone = inputt
+            elif inputt.startswith('+1'):
+                dt = split(inputt)
+                telephone = str("""(""") + str(dt[2]) + str(dt[3]) +str(dt[4])+ str(""")""") +str(dt[5]) + str(dt[6])+str(dt[7]) + str("""-""") + str(dt[8]) + str(dt[9])+ str(dt[10])+ str(dt[11])
+            else:
+                dt = split(inputt)
+                telephone = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
+            bc = driver["Drivers_full_name_Street_Address_City_and_State"].split(" ")
+            name= []
+            add =[]
+            y= 'sdf'
+            for x in bc:
+                if hasNumbers(x):
+                    add.append(x)
+                    y = "fds"
+                else:
+                    if y =='sdf':
+                        name.append(x)
+                    else:
+                        add.append(x)
+            dfname = ' '.join(map(str,name))
+            daddess = ' '.join(map(str,add))
+
+            cd_pk = CrashDrivers.objects.create(
+                crash_report_case_no = data["crash_report_case_no"],
+                Drivers_full_name= dfname,
+                Street_Address_City_and_State = daddess,
+                zipcode= driver['zipcode'],
+                telephone = telephone,
+                dob = dob_date,
+                race = driver['race'],
+                sex = driver['sex'],
+                dL_state = driver['dL_state'],
+                driving_license_no = driver['driving_license_no']
+            )
+        return redirect('car-report')
 
 class DataReport(View):
     def get(self, request, *args, **kwargs):
@@ -106,6 +172,10 @@ class RequestReportView(View):
         driver.close()
         return redirect('request-report')
 
+class PurchasedReportView(View):
+    def get(self, request, *args, **kwargs):
+        reports = RequestReport.objects.filter(report_confirmation_num__isnull=False).order_by('-crash_report_num')
+        return render(request, "purchase_report.html", {"reports": reports})
 def increment_report_num(report_num):
     
     return "0" + str(int(report_num[1:])+1)
@@ -117,105 +187,6 @@ def nu(num1, num2):
     return num1
 def split(word): 
     return [char for char in word] 
-def parse_pdf(request):
-    if request.method == "POST":
-        file_attached = request.FILES["filename"]
-        data = scrap_data(request.FILES["filename"])
-        # month = int(data.get("date_month"))
-        # day = int(data.get("date_day"))
-        # year = int(data.get("date_year"))
-        # data_date = datetime.strptime(str(nu(year, nu(day, month))), "%Y%d%m")
-        # dob_date= data.get("DOB_Month") + str("/")+data.get("DOB_Day") +str("/")+ data.get("DOB_Year")
-        # inputt = data.get('telephone')
-        # dt = split(inputt)
-        # telephone1 = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
-        # bc = data["Drivers_full_name_Street_Address_City_and_State"].split(" ")
-    
-        # # for second driver
-        # month1 = int(data.get("date_month1"))
-        # day1 = int(data.get("date_day1"))
-        # year1 = int(data.get("date_year1"))
-        # data_date1 = datetime.strptime(str(nu(year1, nu(day1, month1))), "%Y%d%m")
-        # dob_date1= data.get("DOB_Month1") + str("/")+data.get("DOB_Day1") +str("/")+ data.get("DOB_Year1")
-        # inputt1 = data.get('telephone1')
-        # dt1 = split(inputt1)
-        # telephone2 = str("""(""") + str(dt1[0]) + str(dt1[1]) +str(dt1[2])+  str(""")""") +str(dt1[3]) + str(dt1[4])+str(dt1[5]) + str("""-""") + str(dt1[6]) + str(dt1[7])+ str(dt1[8])+ str(dt1[9])
-        # bc1 = data["Drivers_full_name_Street_Address_City_and_State1"].split(" ")
-        # name= []
-        # add =[]
-        # y= 'sdf'
-        # for x in bc:
-        #    try:
-        #     int(x)
-        #     add.append(str(x))
-        #     y = "fds"
-        #    except Exception as e:
-        #          if y =='sdf':
-        #            name.append(x)
-        #          else:
-        #            add.append(x)
-        #            dfname = ' '.join(map(str,name))
-        #            daddess = ' '.join(map(str,add))
-        # name1= []
-        # add1 =[]
-        # y1= 'sdf'
-        # for x1 in bc1:
-        #    try:
-        #     int(x1)
-        #     add1.append(str(x1))
-        #     y1 = "fds"
-        #    except Exception as e:
-        #          if y1 =='sdf':
-        #            name1.append(x1)
-        #          else:
-        #            add1.append(x1)
-        #            dfname1 = ' '.join(map(str,name1))
-        #            daddess1 = ' '.join(map(str,add1)) 
-        # pk = CrashReport.objects.create(
-        #     crash_report_case_no=data["crash_report_case_no"],
-        #     local_case_no=data["local_case_no"],
-        #     date=data_date,
-        #     time=data["time"],
-        #     day_of_week=data["day_of_week"],
-        #     county=data["county"],
-        #     city=data["city"],
-        #     Drivers_full_name=dfname,
-        #     Street_Address_City_and_State=daddess,
-        #     zipcode=data["zipcode"],
-        #     telephone=telephone1,
-        #     dob=dob_date,
-        #     race=data["race"],
-        #     sex=data["sex"],
-        #     dL_state=data["dL_state"],
-        #     driving_license_no=data["driving_license_no"],
-        #     file_attached=file_attached,
-        # )
-
-        """
-        Code commmented for the 2nd driver info saving
-        """
-        # pk = CrashReport.objects.create(
-        #     crash_report_case_no=data["crash_report_case_no"],
-        #     local_case_no=data["local_case_no"],
-        #     date=data_date1,
-        #     time=data["time1"],
-        #     day_of_week=data["day_of_week1"],
-        #     county=data["county1"],
-        #     city=data["city1"],
-        #     Drivers_full_name=dfname1,
-        #     Street_Address_City_and_State=daddess1,
-        #     zipcode=data["zipcode1"],
-        #     telephone=telephone2,
-        #     dob=dob_date1,
-        #     race=data["race1"],
-        #     sex=data["sex1"],
-        #     dL_state=data["dL_state1"],
-        #     driving_license_no=data["driving_license_no1"],
-        #     file_attached=file_attached,
-        # )
-        messages.success(request, f"Scraped and saved successfully!")
-        return redirect("car-report")
-    return render(request, "data_report.html")
 
 def savefile(request):
         form = CarReportForm(request.POST)
@@ -232,3 +203,6 @@ def requestreportview(request):
 def automator(request):
     if request.method == "POST":
         pass
+
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)

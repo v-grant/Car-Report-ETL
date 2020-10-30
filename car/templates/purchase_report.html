@@ -2,22 +2,11 @@
 {% extends 'base.html' %} 
 {% block content %}
 <div class="container-fluid mt-5">
-  <div class="row my-2">
-    <div class="col-md-4 text-left">
-      <a href="{% url 'car-report' %}" class="btn btn-default">Back</a>
-    </div>
-  </div>
-  <!-- <div class="row">
-    <div class="col-8">
-      <form class="form-inline" name="automator" enctype = "multipart/form-data" method = "POST"> {% csrf_token %}
-        <label for="cr_number" class="form-label">Crash Report Number: </label> &nbsp;&nbsp;&nbsp;
-        <input id="cr_number" name="cr_number" class="form-control" type="text" /> &nbsp;&nbsp;&nbsp;
-        <button type="submit" class="btn btn-primary">Request Report</button>
-      </form>
-    </div>
-    <div class="col-4">
-    </div>
-  </div> -->
+    <div class="row my-2">
+        <div class="col-md-4 text-left">
+          <a href="{% url 'car-report' %}" class="btn btn-default">Back</a>
+        </div>
+      </div>
   <div class="row">
     <div class="col-md-12 text-right">
       <button id="download_csv" class="btn btn-info">Download</button>
@@ -31,8 +20,8 @@
           <td> Report Type</td>
           <td> Crash Date</td>
           <td> Name</td>
-          <td> County</td>
-          <td> Search Date</td>
+          <td> Confirmation Num</td>
+          <td> Purchase Date</td>
         </thead>
         <tbody>
           {% for x in reports %}
@@ -50,10 +39,10 @@
               {{ x.driver_name }}
             </td>
             <td>
-              {{ x.county }}
+              {{ x.report_confirmation_num }}
             </td>
             <td>
-              {{ x.search_date }}
+              {{ x.purchase_date }}
             </td>
           </tr>
           {% endfor %}

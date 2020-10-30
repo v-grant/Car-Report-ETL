@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-
 class CrashReport(models.Model):
     crash_report_case_no = models.CharField(max_length=20)
     local_case_no = models.CharField(max_length=15)
@@ -55,6 +54,7 @@ class RequestReport(models.Model):
     updatd_date = models.DateTimeField(auto_now=True, blank=True)
     report_confirmation_num = models.CharField(max_length=30, null=True, blank=True)
     report_name = models.CharField(max_length=100, null=True, blank=True)
+    purchase_date =  models.CharField(max_length=100, null=True, blank=True)
 
     @property
     def search_result_type(self):

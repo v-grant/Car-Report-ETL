@@ -106,7 +106,7 @@ function export_table_to_csv(html, filename) {
       if(a_tags.length > 0){
         text = a_tags[0].href;
       }
-      text = text.replace(/,/g, ';');
+      text = text.replace(/,/g, ' ');
       row.push(text);  
     }
     csv.push(row.join(","));		

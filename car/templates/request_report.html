@@ -79,7 +79,7 @@
 			
 			for (var j = 0; j < cols.length; j++) {
         var text = cols[j].innerText;
-        text = text.replace(/,/g, ';');
+        text = text.replace(/,/g, ' ');
         row.push(text);  
       }
 			csv.push(row.join(","));		

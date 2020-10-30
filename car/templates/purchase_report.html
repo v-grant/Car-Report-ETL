@@ -15,8 +15,8 @@
           <td> Report Type</td>
           <td> Crash Date</td>
           <td> Name</td>
-          <td> County</td>
-          <td> Search Date</td>
+          <td> Confirmation Num</td>
+          <td> Purchase Date</td>
         </thead>
         <tbody>
           {% for x in reports %}
@@ -34,10 +34,10 @@
               {{ x.driver_name }}
             </td>
             <td>
-              {{ x.county }}
+              {{ x.report_confirmation_num }}
             </td>
             <td>
-              {{ x.search_date }}
+              {{ x.purchase_date }}
             </td>
           </tr>
           {% endfor %}

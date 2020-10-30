@@ -54,6 +54,7 @@ class RequestReport(models.Model):
     updatd_date = models.DateTimeField(auto_now=True, blank=True)
     report_confirmation_num = models.CharField(max_length=30, null=True, blank=True)
     report_name = models.CharField(max_length=100, null=True, blank=True)
+    purchase_date =  models.CharField(max_length=100, null=True, blank=True)
 
     @property
     def search_result_type(self):

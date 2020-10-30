@@ -45,18 +45,21 @@ class CrashDrivers(models.Model):
 
 
 class RequestReport(models.Model):
-    search_result_choices = ( 
-        ("0", "Not Existing"), 
-        ("1", "Necessary"), 
-        ("2", "Old Report"), 
-        ("3", "Single Car Accident"), 
-        ("4", "Both Of Reasons"), 
-    )   
     crash_report_num = models.CharField(max_length=100, null=True, blank=True)
     crash_date = models.CharField(max_length=100, null=True, blank=True)
     driver_name = models.CharField(max_length=100, null=True, blank=True)
     county = models.CharField(max_length=100, null=True, blank=True)
     search_date =  models.CharField(max_length=100, null=True, blank=True)
-    search_result = models.CharField(max_length=1, choices = search_result_choices, null=True, blank=True)
+    search_result = models.CharField(max_length=1, null=True, blank=True)
     inserted_date = models.DateTimeField(auto_now_add=True, blank=True)    
     updatd_date = models.DateTimeField(auto_now=True, blank=True)
+    report_confirmation_num = models.CharField(max_length=30, null=True, blank=True)
+    report_name = models.CharField(max_length=100, null=True, blank=True)
+
+    @property
+    def search_result_type(self):
+        try:
+            search_result_choices = {"0": "Not Existing", "1": "Needed", "2": "Old Report", "3": "Single Car Accident", "4": "Both Of Reasons"}
+            return search_result_choices[self.search_result]
+        except:
+            return None

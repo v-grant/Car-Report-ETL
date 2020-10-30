@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 import reportlab
 
 from script.pdf_parser import scrap_data
-from script.generate_report import request_report
+from script.generate_report import search_report, scrape_reportinfo
 import time 
 
 class CrashReportViews(View):
@@ -36,67 +36,80 @@ class DataReport(View):
 class RequestReportView(View):
     def get(self, request, *args, **kwargs):
         reports = RequestReport.objects.all()
-        return render(request, "Request_report.html", {"reports": reports})
+        return render(request, "request_report.html", {"reports": reports})
     
     def post(self, request, *args, **kwargs):
         cr_number = request.POST.get('cr_number')
-
         #run selenium to fetch the crach report
-        results = request_report(cr_number)
-        driver_name = ''
-        search_result_type = '0'
-        is_one_line = False
-        is_date_expired = False
-        if len(results) > 0:
-            if len(results) == 1:
-                is_one_line = True
-            cr_date = results[0]['Crash_Date']
-            cr_timestamp = time.mktime(datetime.strptime(cr_date, "%m/%d/%Y").timetuple())
-            now_timestamp = time.time()
-            if((now_timestamp - cr_timestamp) > (7 * 3600 * 24)):
-                is_date_expired = True
-            for result in results:
-                driver_name = f'({result["Name"]})' if driver_name == '' else f'{driver_name} ({result["Name"]})'
-            
-            if is_one_line == True and is_date_expired == True:
-                search_result_type ='4'
-            elif is_one_line == True:
-                search_result_type = '3'
-            elif is_date_expired == True:
-                search_result_type = '2'
-            else:
-                search_result_type = '1'
-            
-            #store/update db row
-            try:
-                request_report_obj = RequestReport.objects.get(crash_report_num=cr_number)
-            except RequestReport.DoesNotExist:
-                request_report_obj = RequestReport()
-                request_report_obj.inserted_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            request_report_obj.crash_report_num = cr_number
-            request_report_obj.driver_name = driver_name
-            request_report_obj.crash_date = datetime.strptime(cr_date, "%m/%d/%Y").strftime('%Y-%m-%d')
-            request_report_obj.county = results[0]['County']
-            request_report_obj.search_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            request_report_obj.search_result = search_result_type
-            request_report_obj.updatd_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            
-            request_report_obj.save()
-        else:
-            search_result_type == '0'
-            try:
-                request_report_obj = RequestReport.objects.get(crash_report_num=cr_number)
-            except RequestReport.DoesNotExist:
-                request_report_obj = RequestReport()
-                request_report_obj.inserted_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            request_report_obj.crash_report_num = cr_number
-            request_report_obj.search_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            request_report_obj.search_result = search_result_type
-            request_report_obj.updatd_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            
-            request_report_obj.save()
+        count = 0
 
+        driver = search_report()
+
+        for count in range(0, 1000):
+            print(cr_number)
+            driver, results = scrape_reportinfo(driver, cr_number)
+            driver_name = ''
+            search_result_type = '0'
+            is_one_line = False
+            is_date_expired = False
+            if len(results) > 0:
+                if len(results) == 1:
+                    is_one_line = True
+                cr_date = results[0]['Crash_Date']
+                cr_timestamp = time.mktime(datetime.strptime(cr_date, "%m/%d/%Y").timetuple())
+                now_timestamp = time.time()
+                if((now_timestamp - cr_timestamp) > (6 * 3600 * 24)):
+                    is_date_expired = True
+                for result in results:
+                    driver_name = f'({result["Name"]})' if driver_name == '' else f'{driver_name} ({result["Name"]})'
+                
+                if is_one_line == True and is_date_expired == True:
+                    search_result_type ='4'
+                elif is_one_line == True:
+                    search_result_type = '3'
+                elif is_date_expired == True:
+                    search_result_type = '2'
+                else:
+                    search_result_type = '1'
+                
+                #store/update db row
+                try:
+                    request_report_obj = RequestReport.objects.get(crash_report_num=cr_number)
+                except RequestReport.DoesNotExist:
+                    request_report_obj = RequestReport()
+                    request_report_obj.inserted_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.crash_report_num = cr_number
+                request_report_obj.driver_name = driver_name
+                request_report_obj.crash_date = datetime.strptime(cr_date, "%m/%d/%Y").strftime('%Y-%m-%d')
+                request_report_obj.county = results[0]['County']
+                request_report_obj.search_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.search_result = search_result_type
+                request_report_obj.updatd_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                
+                request_report_obj.save()
+            else:
+                search_result_type == '0'
+                try:
+                    request_report_obj = RequestReport.objects.get(crash_report_num=cr_number)
+                except RequestReport.DoesNotExist:
+                    request_report_obj = RequestReport()
+                    request_report_obj.inserted_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.crash_report_num = cr_number
+                request_report_obj.search_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                request_report_obj.search_result = search_result_type
+                request_report_obj.updatd_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                
+                request_report_obj.save()
+
+            cr_number = increment_report_num(cr_number)
+        
+        driver.close()
         return redirect('request-report')
+
+def increment_report_num(report_num):
+    
+    return "0" + str(int(report_num[1:])+1)
+
 def nu(num1, num2):
     digits = len(str(num2))
     num1 = num1 * (10 ** digits)
@@ -172,7 +185,7 @@ def savefile(request):
 
 def requestreportview(request):
 
-    return render(request, "Request_report.html", {})
+    return render(request, "request_report.html", {})
 
 def automator(request):
     if request.method == "POST":

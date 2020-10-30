@@ -2,14 +2,14 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from time import sleep
 
-def request_report(cr_number):
+def search_report():
 
     SECOND_ADDRESS = "SECOND_ADDRESS"
     CITY = "CITY"
-    FIRSTNAME = "FIRSTNAME"
-    LASTNAME = "LASTNAME"
-    PHONENUMBER = "123-123-1234"
-    CRASHREPORTNUMBER = cr_number
+    FIRSTNAME = "Uri"
+    LASTNAME = "Jin"
+    PHONENUMBER = "390-237-4870"
+    # CRASHREPORTNUMBER = cr_number
     CCNUMBER = "1234567891234567"
     CCNAME = "CCNAME"
     CCADDRESS1 = "CCADDRESS1"
@@ -20,11 +20,12 @@ def request_report(cr_number):
     options.add_argument("--start-maximized")
 
     #for windows system
-    driver = webdriver.Chrome(
-        executable_path="D:/chromedriver.exe", chrome_options=options
-    )
+    # driver = webdriver.Chrome(
+    #     executable_path="D:/chromedriver.exe", chrome_options=options
+    # )
     # # Initialize the Chrome webdriver and open the URL
-    # driver = webdriver.Chrome(chrome_options=options)
+    
+    driver = webdriver.Chrome(chrome_options=options)
 
     driver.implicitly_wait(30)
 
@@ -51,17 +52,10 @@ def request_report(cr_number):
 
     driver.find_element_by_xpath("//input[@value='Continue']").click()
 
-    # Step 3: Crash Report Search Page, https://www.alabamainteractive.org/dps_crash_report/contactInformation.action
-    # Enter the Crash Report Number and Click 'Search for Report' button
-    inputElement = driver.find_element_by_xpath("//input[@name='crashReportSearchObject.crashReportNumber']")
-    inputElement.send_keys(CRASHREPORTNUMBER)
-
-    driver.find_element_by_xpath("//input[@value='Search for Report']").click()
-
-    sleep(3)
     
-    soup = BeautifulSoup(driver.page_source, "lxml")
-    return scrape_reportinfo(soup)
+    
+    return driver
+    
 
     # driver.find_element_by_link_text("Add to Cart").click()
 
@@ -130,10 +124,21 @@ def request_report(cr_number):
     # driver.find_element_by_xpath("//input[@value='Submit Payment']").click()
 
 # To Get each letter page url link
-def scrape_reportinfo(soup):
+def scrape_reportinfo(driver, cr_number):
 
     reports = []
 
+    # Step 3: Crash Report Search Page, https://www.alabamainteractive.org/dps_crash_report/contactInformation.action
+    # Enter the Crash Report Number and Click 'Search for Report' button
+    inputElement = driver.find_element_by_xpath("//input[@name='crashReportSearchObject.crashReportNumber']")
+    inputElement.clear()
+    inputElement.send_keys(cr_number)
+
+    driver.find_element_by_xpath("//input[@value='Search for Report']").click()
+
+    sleep(10)
+
+    soup = BeautifulSoup(driver.page_source, "lxml")
     container = soup.find('form', {"id": "crash-search-form"})
     table = container.find_all('table')[-1]
     # print(table)
@@ -141,13 +146,13 @@ def scrape_reportinfo(soup):
     # if table.find('td', {"class": "reportHeader"}) is not None and table.find('td', {"class": "reportHeader"}).text.strip() == "Search Results":
     index = 1
     for inner_tr in table.tbody.find_all('tr', recursive=False):
-        print(inner_tr)
+        
         if index < 3: 
             index = index + 1
             continue
         reports.append({'Crash_Date': inner_tr.find_all('td')[0].text.strip(), 'Name': inner_tr.find_all('td')[1].text.strip(), 'County': inner_tr.find_all('td')[2].text.strip()})
 
-    print(reports)
-    return reports
+    # print(reports)
+    return driver, reports
     
 # request_report()

@@ -19,6 +19,11 @@
     </div>
   </div>
   <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-md-12 text-right">
+        <button id="download_csv" class="btn btn-info">Download</button>
+      </div>
+    </div>
       <table id="dt-table" class="table table-striped table-bordered table-hover table-responsive ">
         <thead class="table thead-dark"> 
           <tr>
@@ -71,10 +76,46 @@
 
 
       {{data}}
+      
   </div>
 <script type="text/javascript">
 $('form .autosubmit').on('change', function() {
    this.form.submit();
+});
+function download_csv(csv, filename) {
+  var csvFile;
+  var downloadLink;
+  csvFile = new Blob([csv], {type: "text/csv"});
+  downloadLink = document.createElement("a");
+  downloadLink.download = filename;
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+  downloadLink.style.display = "none";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+}
+function export_table_to_csv(html, filename) {
+  var csv = [];
+  var rows = document.querySelectorAll("table tr");
+  
+  for (var i = 0; i < rows.length; i++) {
+    var row = [], cols = rows[i].querySelectorAll("td, th");
+    
+    for (var j = 0; j < cols.length; j++) {
+      var a_tags = cols[j].querySelectorAll('a');
+      var text = cols[j].innerText;
+      if(a_tags.length > 0){
+        text = a_tags[0].href;
+      }
+      text = text.replace(/,/g, ';');
+      row.push(text);  
+    }
+    csv.push(row.join(","));		
+  }
+  download_csv(csv.join("\n"), filename);
+}
+document.getElementById("download_csv").addEventListener("click", function () {
+  var html = document.getElementById("dt-table").outerHTML;
+  export_table_to_csv(html, "CarAccidentReport.csv");
 });
 </script>
 {% endblock %}

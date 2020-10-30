@@ -104,7 +104,7 @@ class DataReport(View):
 
 class RequestReportView(View):
     def get(self, request, *args, **kwargs):
-        reports = RequestReport.objects.filter(search_result__in=['1', '2', '3', '4']).order_by('-crash_report_num')
+        reports = RequestReport.objects.filter(search_result__in=['1', '2', '3', '4'], county='JEFFERSON').order_by('-crash_report_num')
         return render(request, "request_report.html", {"reports": reports})
     
     def post(self, request, *args, **kwargs):

@@ -6,9 +6,9 @@ def search_report():
 
     SECOND_ADDRESS = "SECOND_ADDRESS"
     CITY = "CITY"
-    FIRSTNAME = "Uri"
-    LASTNAME = "Jin"
-    PHONENUMBER = "390-237-4870"
+    FIRSTNAME = "Ior"
+    LASTNAME = "Maxell"
+    PHONENUMBER = "487-237-3901"
     # CRASHREPORTNUMBER = cr_number
     CCNUMBER = "1234567891234567"
     CCNAME = "CCNAME"

@@ -4,17 +4,17 @@ from django.shortcuts import render, redirect
 from .forms import CarReportForm, DataViewForm, RequestReportForm
 from .models import CrashReport, RequestReport
 from datetime import datetime
+import time
 from django.views.static import serve
 from django.contrib import messages
 from django.views.generic import View
 from reportlab.pdfgen import canvas
 from bs4 import BeautifulSoup
-import pdfplumber
 import reportlab
 
+#parsing & scraping scripts
 from script.pdf_parser import scrap_data
 from script.generate_report import search_report, scrape_reportinfo
-import time 
 
 class CrashReportViews(View):
     def get(self, request, *args, **kwargs):
@@ -32,131 +32,6 @@ class DataReport(View):
         if form.is_valid():
             form.save()
         return render(request, "car_report.html", {"form": form})
-
-def scrap_data(file_data):
-
-    pdf = pdfplumber.open(file_data)
-    page = pdf.pages[0]
-    crcn = page.extract_text()[66:73]
-    dict1 = {}
-    dict1 = {}
-    for c1, table in enumerate(page.extract_tables()):
-        for c2, list in enumerate(table):
-            for c3, x in enumerate(list):
-                if x != None:
-                    d = {"crash_report_case_no": crcn}
-                    dict1.update(d)
-                    if c1 == 2 and c2 == 0 and c3 == 0:
-                        d = {"local_case_no": x[15:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 3:
-                        d = {"date_month": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 4:
-                        d = {"date_day": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 8:
-                        d = {"date_year": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 13:
-                        d = {"time": x[5:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 21:
-                        d = {"day_of_week": x[12:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 26:
-                        d = {"county": x[7:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 38:
-                        d = {"city": x[11:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 7 and c3 == 2:
-                        d = {"Drivers_full_name_Street_Address_City_and_State": x[47:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 7 and c3 == 46:
-                        d = {"zipcode": x[4:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 7 and c3 == 50:
-                        d = {"telephone": x[10:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 3:
-                        d = {"DOB_Month": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 4:
-                        d = {"DOB_Day": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 8:
-                        d = {"DOB_Year": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 12:
-                        d = {"race": x[5:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 15:
-                        d = {"sex": x[4:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 16:
-                        d = {"dL_state": x[9:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 8 and c3 == 20:
-                        d = {"driving_license_no": x[19:]}
-                        dict1.update(d)
-                        d = {"crash_report_case_no": crcn}
-                    dict1.update(d)
-                    if c1 == 2 and c2 == 0 and c3 == 0:
-                        d = {"local_case_no": x[15:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 3:
-                        d = {"date_month1": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 4:
-                        d = {"date_day1": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 8:
-                        d = {"date_year1": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 13:
-                        d = {"time1": x[5:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 21:
-                        d = {"day_of_week1": x[12:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 26:
-                        d = {"county1": x[7:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 0 and c3 == 38:
-                        d = {"city1": x[11:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 24 and c3 == 2:
-                        d = {"Drivers_full_name_Street_Address_City_and_State1": x[47:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 24 and c3 == 46:
-                        d = {"zipcode1": x[4:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 24 and c3 == 50:
-                        d = {"telephone1": x[10:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 3:
-                        d = {"DOB_Month1": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 4:
-                        d = {"DOB_Day1": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 8:
-                        d = {"DOB_Year1": x}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 12:
-                        d = {"race1": x[5:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 15:
-                        d = {"sex1": x[4:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 16:
-                        d = {"dL_state1": x[9:]}
-                        dict1.update(d)
-                    if c1 == 0 and c2 == 25 and c3 == 20:
-                        d = {"driving_license_no1": x[19:]}
-                        dict1.update(d)
-    return dict1
 
 class RequestReportView(View):
     def get(self, request, *args, **kwargs):
@@ -246,75 +121,75 @@ def parse_pdf(request):
     if request.method == "POST":
         file_attached = request.FILES["filename"]
         data = scrap_data(request.FILES["filename"])
-        month = int(data.get("date_month"))
-        day = int(data.get("date_day"))
-        year = int(data.get("date_year"))
-        data_date = datetime.datetime.strptime(str(nu(year, nu(day, month))), "%Y%d%m")
-        dob_date= data.get("DOB_Month") + str("/")+data.get("DOB_Day") +str("/")+ data.get("DOB_Year")
-        inputt = data.get('telephone')
-        dt = split(inputt)
-        telephone1 = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
-        bc = data["Drivers_full_name_Street_Address_City_and_State"].split(" ")
+        # month = int(data.get("date_month"))
+        # day = int(data.get("date_day"))
+        # year = int(data.get("date_year"))
+        # data_date = datetime.strptime(str(nu(year, nu(day, month))), "%Y%d%m")
+        # dob_date= data.get("DOB_Month") + str("/")+data.get("DOB_Day") +str("/")+ data.get("DOB_Year")
+        # inputt = data.get('telephone')
+        # dt = split(inputt)
+        # telephone1 = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
+        # bc = data["Drivers_full_name_Street_Address_City_and_State"].split(" ")
     
-        # for second driver
-        month1 = int(data.get("date_month1"))
-        day1 = int(data.get("date_day1"))
-        year1 = int(data.get("date_year1"))
-        data_date1 = datetime.datetime.strptime(str(nu(year1, nu(day1, month1))), "%Y%d%m")
-        dob_date1= data.get("DOB_Month1") + str("/")+data.get("DOB_Day1") +str("/")+ data.get("DOB_Year1")
-        inputt1 = data.get('telephone1')
-        dt1 = split(inputt1)
-        telephone2 = str("""(""") + str(dt1[0]) + str(dt1[1]) +str(dt1[2])+  str(""")""") +str(dt1[3]) + str(dt1[4])+str(dt1[5]) + str("""-""") + str(dt1[6]) + str(dt1[7])+ str(dt1[8])+ str(dt1[9])
-        bc1 = data["Drivers_full_name_Street_Address_City_and_State1"].split(" ")
-        name= []
-        add =[]
-        y= 'sdf'
-        for x in bc:
-           try:
-            int(x)
-            add.append(str(x))
-            y = "fds"
-           except Exception as e:
-                 if y =='sdf':
-                   name.append(x)
-                 else:
-                   add.append(x)
-                   dfname = ' '.join(map(str,name))
-                   daddess = ' '.join(map(str,add))
-        name1= []
-        add1 =[]
-        y1= 'sdf'
-        for x1 in bc1:
-           try:
-            int(x1)
-            add1.append(str(x1))
-            y1 = "fds"
-           except Exception as e:
-                 if y1 =='sdf':
-                   name1.append(x1)
-                 else:
-                   add1.append(x1)
-                   dfname1 = ' '.join(map(str,name1))
-                   daddess1 = ' '.join(map(str,add1)) 
-        pk = CrashReport.objects.create(
-            crash_report_case_no=data["crash_report_case_no"],
-            local_case_no=data["local_case_no"],
-            date=data_date,
-            time=data["time"],
-            day_of_week=data["day_of_week"],
-            county=data["county"],
-            city=data["city"],
-            Drivers_full_name=dfname,
-            Street_Address_City_and_State=daddess,
-            zipcode=data["zipcode"],
-            telephone=telephone1,
-            dob=dob_date,
-            race=data["race"],
-            sex=data["sex"],
-            dL_state=data["dL_state"],
-            driving_license_no=data["driving_license_no"],
-            file_attached=file_attached,
-        )
+        # # for second driver
+        # month1 = int(data.get("date_month1"))
+        # day1 = int(data.get("date_day1"))
+        # year1 = int(data.get("date_year1"))
+        # data_date1 = datetime.strptime(str(nu(year1, nu(day1, month1))), "%Y%d%m")
+        # dob_date1= data.get("DOB_Month1") + str("/")+data.get("DOB_Day1") +str("/")+ data.get("DOB_Year1")
+        # inputt1 = data.get('telephone1')
+        # dt1 = split(inputt1)
+        # telephone2 = str("""(""") + str(dt1[0]) + str(dt1[1]) +str(dt1[2])+  str(""")""") +str(dt1[3]) + str(dt1[4])+str(dt1[5]) + str("""-""") + str(dt1[6]) + str(dt1[7])+ str(dt1[8])+ str(dt1[9])
+        # bc1 = data["Drivers_full_name_Street_Address_City_and_State1"].split(" ")
+        # name= []
+        # add =[]
+        # y= 'sdf'
+        # for x in bc:
+        #    try:
+        #     int(x)
+        #     add.append(str(x))
+        #     y = "fds"
+        #    except Exception as e:
+        #          if y =='sdf':
+        #            name.append(x)
+        #          else:
+        #            add.append(x)
+        #            dfname = ' '.join(map(str,name))
+        #            daddess = ' '.join(map(str,add))
+        # name1= []
+        # add1 =[]
+        # y1= 'sdf'
+        # for x1 in bc1:
+        #    try:
+        #     int(x1)
+        #     add1.append(str(x1))
+        #     y1 = "fds"
+        #    except Exception as e:
+        #          if y1 =='sdf':
+        #            name1.append(x1)
+        #          else:
+        #            add1.append(x1)
+        #            dfname1 = ' '.join(map(str,name1))
+        #            daddess1 = ' '.join(map(str,add1)) 
+        # pk = CrashReport.objects.create(
+        #     crash_report_case_no=data["crash_report_case_no"],
+        #     local_case_no=data["local_case_no"],
+        #     date=data_date,
+        #     time=data["time"],
+        #     day_of_week=data["day_of_week"],
+        #     county=data["county"],
+        #     city=data["city"],
+        #     Drivers_full_name=dfname,
+        #     Street_Address_City_and_State=daddess,
+        #     zipcode=data["zipcode"],
+        #     telephone=telephone1,
+        #     dob=dob_date,
+        #     race=data["race"],
+        #     sex=data["sex"],
+        #     dL_state=data["dL_state"],
+        #     driving_license_no=data["driving_license_no"],
+        #     file_attached=file_attached,
+        # )
 
         """
         Code commmented for the 2nd driver info saving

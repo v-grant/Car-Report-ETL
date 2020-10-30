@@ -12,6 +12,20 @@ class CrashReport(models.Model):
     county = models.CharField(max_length=35)
     city = models.CharField(max_length=35)
     rural = models.BooleanField(null=True, blank=True)
+    file_attached = models.FileField(upload_to="files/", null=True, verbose_name="")
+
+    def __str__(self):
+        return self.crash_report_case_no
+
+    @property
+    def drivers(self):
+        try:
+            return CrashDrivers.objects.filter(crash_report_case_no=self.crash_report_case_no)
+        except:
+            return []
+
+class CrashDrivers(models.Model):
+    crash_report_case_no = models.CharField(max_length=20)
     Drivers_full_name = models.CharField(max_length=255, null=True)
     Street_Address_City_and_State = models.CharField(max_length=255, null=True)
     zipcode = models.CharField(max_length=20)
@@ -21,10 +35,13 @@ class CrashReport(models.Model):
     sex = models.CharField(max_length=10)
     dL_state = models.CharField(max_length=35)
     driving_license_no = models.CharField(max_length=15)
-    file_attached = models.FileField(upload_to="files/", null=True, verbose_name="")
 
-    def __str__(self):
-        return self.crash_report_case_no
+    @property
+    def crash_report(self):
+        try:
+            return CrashReport.objects.get(crash_report_case_no=self.crash_report_case_no)
+        except:
+            return None
 
 
 class RequestReport(models.Model):

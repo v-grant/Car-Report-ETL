@@ -51,6 +51,7 @@
         </thead>
         <tbody>
           {% for x in queryset %}
+          {% if x.crash_report != None %}
           <tr>
             <td>{{x.crash_report_case_no}}</td>
             <!-- <td>{{x.local_case_no}}</td> -->
@@ -72,6 +73,7 @@
             <td><a href="{{ MEDIA_URL }}{{ x.crash_report.file_attached }}" target="_blank">{{x.crash_report.file_attached}}</a>
             </td>
           </tr>
+          {% endif %}
           {% endfor %}
         </tbody>
       </table>

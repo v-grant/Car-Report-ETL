@@ -2,26 +2,30 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from time import sleep
 
-def request_report():
+def request_report(cr_number):
 
     SECOND_ADDRESS = "SECOND_ADDRESS"
     CITY = "CITY"
     FIRSTNAME = "FIRSTNAME"
     LASTNAME = "LASTNAME"
     PHONENUMBER = "123-123-1234"
-    CRASHREPORTNUMBER = "0707261"
+    CRASHREPORTNUMBER = cr_number
     CCNUMBER = "1234567891234567"
     CCNAME = "CCNAME"
     CCADDRESS1 = "CCADDRESS1"
     CCZIP = "55555-4444"
 
-
     # Define Chrome options to open the window in maximized mode
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
 
-    # Initialize the Chrome webdriver and open the URL
-    driver = webdriver.Chrome(chrome_options=options)
+    #for windows system
+    driver = webdriver.Chrome(
+        executable_path="D:/chromedriver.exe", chrome_options=options
+    )
+    # # Initialize the Chrome webdriver and open the URL
+    # driver = webdriver.Chrome(chrome_options=options)
+
     driver.implicitly_wait(30)
 
     # driver = webdriver.Chrome(
@@ -57,7 +61,7 @@ def request_report():
     sleep(3)
     
     soup = BeautifulSoup(driver.page_source, "lxml")
-    report = scrape_reportinfo(soup)
+    return scrape_reportinfo(soup)
 
     # driver.find_element_by_link_text("Add to Cart").click()
 
@@ -132,8 +136,8 @@ def scrape_reportinfo(soup):
 
     container = soup.find('form', {"id": "crash-search-form"})
     table = container.find_all('table')[-1]
-    print(table)
-    print(table.find('td', {"class": "reportHeader"}))
+    # print(table)
+    # print(table.find('td', {"class": "reportHeader"}))
     # if table.find('td', {"class": "reportHeader"}) is not None and table.find('td', {"class": "reportHeader"}).text.strip() == "Search Results":
     index = 1
     for inner_tr in table.tbody.find_all('tr', recursive=False):
@@ -146,4 +150,4 @@ def scrape_reportinfo(soup):
     print(reports)
     return reports
     
-request_report()
+# request_report()

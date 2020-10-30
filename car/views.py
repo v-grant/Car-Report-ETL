@@ -52,12 +52,15 @@ class CrashReportViews(View):
             telephone = inputt
             if inputt.startswith('('):
                 telephone = inputt
-            elif inputt.startswith('+1'):
+            elif inputt.startswith('+1') and len(inputt) == 12 :
                 dt = split(inputt)
                 telephone = str("""(""") + str(dt[2]) + str(dt[3]) +str(dt[4])+ str(""")""") +str(dt[5]) + str(dt[6])+str(dt[7]) + str("""-""") + str(dt[8]) + str(dt[9])+ str(dt[10])+ str(dt[11])
             else:
-                dt = split(inputt)
-                telephone = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
+                if len(inputt) == 10:
+                    dt = split(inputt)
+                    telephone = str("""(""") + str(dt[0]) + str(dt[1]) +str(dt[2])+ str(""")""") +str(dt[3]) + str(dt[4])+str(dt[5]) + str("""-""") + str(dt[6]) + str(dt[7])+ str(dt[8])+ str(dt[9])
+                else:
+                    telephone = inputt
             bc = driver["Drivers_full_name_Street_Address_City_and_State"].split(" ")
             name= []
             add =[]
